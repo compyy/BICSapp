@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BICS Network Executor</title>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/bootstrap-theme.min.css">
+    <script src="static/js/jquery-3.1.1.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+</head>
+
+<div>
+    <pre> {{ ifHostAlive }} </pre>
+</div>
+<div>
+    {% for i in cmd %}
+    <div>
+        <pre> {{ i }} </pre>
+    </div>
+    {% endfor %}
+</div>
+<div>
+    <button type="submit" class="btn btn-primary pull-left"
+            onclick="location.href = 'http://192.168.124.132:5000'" name="action" id="submit">Go Back
+    </button>
+</div>
+</html>
