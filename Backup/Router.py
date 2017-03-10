@@ -2,12 +2,15 @@ from netmiko import ConnectHandler
 
 
 class Router:
-    def __init__(self, input, driver):
-        self.username = input['username']
-        self.password = input['password']
-        self.hostname = input['hostname']
+    def __init__(self, username, password, hostname, driver):
+        self.username = username
+        self.password = password
+        self.hostname = hostname
         self.dead = False
         self.driver = driver
+        self.peer = ''
+        self.interface = ''
+        self.vrf = ''
 
         self.ROUTER = {
             'device_type': self.driver,

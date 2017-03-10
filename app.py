@@ -1,8 +1,9 @@
 import Router
+import F5
 import telnetlib
 from Dictionary import cmd_dict
 from Dictionary import driver_dict
-from flask import Flask, request, flash, url_for, redirect, render_template, g
+from flask import Flask, request, flash, url_for, redirect, render_template, g, session
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 
@@ -11,6 +12,7 @@ app.secret_key = "g0AwAy"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:P@$$w0rd12@localhost/EmpLog'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'False'
 db = SQLAlchemy(app)
+global cmd
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -43,78 +45,112 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 
-def initate_session(username, password, hostname):
-    driver='Cisco'
+def initate_session(input):
+    driver = 'Cisco'
     try:
-        session = telnetlib.Telnet(hostname, 22)
-        get_driver = session.expect([r'^SSH\-\d\.\d+\-(.*)(\-|\_).*', ])
+        connection = telnetlib.Telnet(input['hostname'], 22)
+        get_driver = connection.expect([r'^SSH\-\d\.\d+\-(.*)(\-|\_).*', ])
         driver = get_driver[1].group(1)
-        session.close()
+        connection.close()
 
     except Exception as e:
         print "Unable to Login to the Host Error: ", e
 
-    return Router.Router(username, password, hostname, driver_dict[driver])
+    return Router.Router(input, driver_dict[driver])
 
-def processCMD(session, cmd):
+
+def processCMD(connection, input):
     returncmd = []
-
     for i in cmd:
-        if 'BGP_N_G' in i:
-            if 'BGP_N_G_RR' in i:
-                i = cmd_dict[session.driver][i] + ' ' + session.peer + ' received-routes'
-                returncmd.append(i)
+        if 'GRX' in i:
+            if connection.driver == 'cisco_ios':
+                if 'GRX_ARP_C' in i:
+                    arp_codif = True
+                elif 'GRX_ARP_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + input['peer']
+                    returncmd.append(j)
+                elif 'GRX_BGP_N_AS' in i:
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'summary | i ' + input['AS']
+                    returncmd.append(j)
+                elif 'GRX_BGP_N_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'neighbors ' + input['peer']
+                    returncmd.append(j)
+                elif 'GRX_BGP_N_RR' in i:
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + ' neighbors ' + input['peer'] + ' routes'
+                    returncmd.append(j)
+                elif 'GRX_BGP_N_AR' in i:
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + ' neighbors ' + input['peer'] + ' advertised-routes'
+                    returncmd.append(j)
+                elif 'GRX_BGP_R_AS' in i:
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'regexp ^' + input['AS']
+                    returncmd.append(j)
+                elif 'GRX_INT_C' in i:
+                    int_codif = True
+                elif 'GRX_PING_VRF' in i:
+                    j = 'ping vrf cbugrx1 ' + input['peer']
+                    returncmd.append(j)
+                elif 'GRX_RT' in i:
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + input['prefix']
+                    returncmd.append(j)
+                elif 'GRX_TR' in i:
+                    j = 'traceroute vrf cbugrx1 ' + input['peer']
+                    returncmd.append(j)
 
-            elif 'BGP_N_G_AR' in i:
-                i = cmd_dict[session.driver][i] + ' ' + session.peer + ' advertised-routes'
-                returncmd.append(i)
+            elif connection.driver == 'alcatel_sros':
+                if 'GRX_ARP_C' in i:
+                    arp_codif = True
+                elif 'GRX_ARP_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' 110 arp ' + input['peer']
+                    returncmd.append(j)
+                elif 'GRX_BGP_N_AS' in i:
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + ' bgp neighbor ' + input['AS']
+                    returncmd.append(j)
+                elif 'GRX_BGP_N_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + ' bgp neighbor ' + input['peer']
+                    returncmd.append(j)
+                elif 'GRX_BGP_N_RR' in i:
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + ' bgp neighbor ' + input['peer'] + ' received-routes'
+                    returncmd.append(j)
+                elif 'GRX_BGP_N_AR' in i:
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + ' bgp neighbor ' + input['peer'] + ' advertised-routes'
+                    returncmd.append(j)
+                elif 'GRX_BGP_R_AS' in i:
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp routes aspath-regex ^' + input['AS']
+                    returncmd.append(j)
+                elif 'GRX_INT_C' in i:
+                    int_codif = True
+                elif 'GRX_PING_VRF' in i:
+                    j = 'ping service-name 110 ' + input['peer']
+                    returncmd.append(j)
+                elif 'GRX_RT' in i:
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp routes ' + input['prefix']
+                    returncmd.append(j)
+                elif 'GRX_TR' in i:
+                    j = 'traceroute service-name 110 ' + input['peer']
+                    returncmd.append(j)
 
-            else:
-                i = cmd_dict[session.driver][i] + ' ' + session.peer
-                returncmd.append(i)
-
-        elif 'BGP_N_V' in i:
-            if session.driver == 'cisco_ios':
-                if 'BGP_N_V_RR' in i:
-                    i = cmd_dict[session.driver][i] + ' ' + session.vrf + ' neighbors ' + session.peer + ' routes'
-                    returncmd.append(i)
-
-                elif 'BGP_N_V_AR' in i:
-                    i = cmd_dict[session.driver][
-                            i] + ' ' + session.vrf + ' neighbors ' + session.peer + ' advertised-routes'
-                    returncmd.append(i)
-
-                else:
-                    i = cmd_dict[session.driver][i] + ' ' + session.vrf + ' neighbors ' + session.peer
-                    returncmd.append(i)
-
-            elif session.driver == 'alcatel_sros':
-                if 'BGP_N_V_RR' in i:
-                    i = cmd_dict[session.driver][i] + ' ' + session.vrf + ' ' + session.peer + ' received-routes'
-                    returncmd.append(i)
-
-                elif 'BGP_N_V_AR' in i:
-                    i = cmd_dict[session.driver][i] + ' ' + session.vrf + ' ' + session.peer + ' advertised-routes'
-                    returncmd.append(i)
-
-                else:
-                    i = cmd_dict[session.driver][i] + ' ' + session.vrf + ' ' + session.peer
-                    returncmd.append(i)
-
-        elif 'R_INT' in i:
-            if 'R_INT_C' in i:
-                if session.driver == 'alcatel_sros':
-                    i = cmd_dict[session.driver][i] + ' ' + session.interface + '  statistics'
-                    returncmd.append(i)
-                else:
-                    i = cmd_dict[session.driver][i] + ' ' + session.interface + ' | i rate'
-                    returncmd.append(i)
-            else:
-                i = cmd_dict[session.driver][i] + ' ' + session.interface
-                returncmd.append(i)
-
-    outputCMD = session.runCMD(returncmd)
+    outputCMD = connection.runCMD(returncmd)
     return outputCMD
+
+
+@app.route('/GRX', methods=['GET', 'POST'])
+@login_required
+def GRX():
+    if request.method == 'GET':
+        return render_template('GRX.html')
+
+    input = {'username': request.form['username'],
+             'password': request.form['password'],
+             'hostname': request.form['hostname'],
+             'cmd': cmd,
+             'peer': request.form['peer'],
+             'codif': request.form['codif'],
+             'prefix': request.form['prefix'],
+             'AS': request.form['AS']}
+
+    connection = initate_session(input)
+    outputCMD = processCMD(connection, input)
+    return render_template("output.html", ifHostAlive='', cmd=outputCMD)
 
 
 @login_manager.user_loader
@@ -125,36 +161,19 @@ def load_user(id):
 @app.route('/')
 @login_required
 def index():
-    return redirect(url_for('executeCLI'))
+    return redirect(url_for('take_input'))
 
 
-@app.route('/form', methods=['GET', 'POST'])
+@app.route('/input', methods=['GET', 'POST'])
 @login_required
-def executeCLI():
+def take_input():
     if request.method == 'GET':
-        return render_template('form.html')
+        return render_template('input.html')
 
-    username = request.form['username']
-    password = request.form['password']
-    hostname = request.form['hostname']
-    cmd = request.form.getlist('q9_checks')
-    session = initate_session(username, password, hostname)
-    if session.dead:
-        ifHostAlive = hostname + " is Dead or could not login, Check if IP is correct or contact 2LINF."
-        return render_template("output.html", ifHostAlive=ifHostAlive, cmd='')
-
-    session.peer = request.form['PEER']
-    session.vrf = request.form['VRF']
-    session.interface = request.form['INT']
-
-    if cmd[0] == 'ifHostAlive':
-        ifHostAlive = "Yes: " + hostname + " is Alive."
-        cmd.pop(0)
-    else:
-        ifHostAlive = "Output of Applied Commands: "
-
-    outputCMD = processCMD(session, cmd)
-    return render_template("output.html", ifHostAlive=ifHostAlive, cmd=outputCMD)
+    options = request.form.getlist('selectcmd')
+    global cmd
+    cmd = request.form.getlist(options[0])
+    return redirect(url_for(options[0]))
 
 
 @app.route('/logout')
