@@ -57,7 +57,7 @@
         <select class="selectpicker" id="selectcmd" title="Choose Troubleshooting Options" name="selectcmd"
                 show-menu-arrow data-style="btn-primary" data-width="fit" data-live-search="true">
             <option value="GRX">GRX Troubleshooting</option>
-            <option value="GLOBAL_BGP">IP BGP Troubleshooting</option>
+            <option value="BGP_GLOBAL">IP BGP Global Troubleshooting</option>
             <option value="INT">Interface Level Troubleshooting</option>
             <option value="PLAT">Router/Switch Troubleshooting</option>
             <option value="GIGAMON">GIGAMON Troubleshooting</option>
@@ -68,30 +68,30 @@
                 <select name="GRX" class="selectpicker" title="Choose your option, multiple can be selected" multiple
                         show-menu-arrow data-style="btn-success" data-width="fit" data-selected-text-format="count > 3"
                         data-live-search="true">
-                    <option value="GRX_ARP_C">ARP Table by Codif</option>
+                    <option value="GRX_ARP_C" disabled>ARP Table by Codif</option>
                     <option value="GRX_ARP_IP">ARP Table by IP</option>
                     <option value="GRX_BGP_N_AS">BGP Neighbor Status by ASN</option>
                     <option value="GRX_BGP_N_IP">BGP Neighbor Status by IP</option>
                     <option value="GRX_BGP_N_RR">BGP Neighbor Received Routes</option>
                     <option value="GRX_BGP_N_AR">BGP Neighbor Advertised Routes</option>
                     <option value="GRX_BGP_R_AS">BGP Routes by ASN</option>
-                    <option value="GRX_INT_C">Interface by Codif</option>
+                    <option value="GRX_INT_C" disabled>Interface by Codif</option>
                     <option value="GRX_PING_VRF">Ping Prefixes</option>
                     <option value="GRX_RT">Routing Table Prefix</option>
                     <option value="GRX_TR">Traceroute Prefix</option>
                 </select>
             </div>
-            <div class="GLOBAL_BGP">
+            <div class="BGP_GLOBAL">
                 <br>
-                <select name="GLOBAL_BGP" class="selectpicker" title="Choose your option, multiple can be selected" multiple
+                <select name="BGP_GLOBAL" class="selectpicker" title="Choose your option, multiple can be selected" multiple
                         show-menu-arrow data-style="btn-success" data-width="fit" data-selected-text-format="count > 3"
                         data-live-search="true">
-                    <option value="BGP_N_IP">Check BGP Neighbor Status by IP</option>
-                    <option value="BGP_N_IP_AR">Check BGP Advertised Routes by IP</option>
-                    <option value="BGP_N_IP_RR">Check BGP Received Routes by IP</option>
-                    <option value="BGP_N_AS">Check BGP Neighbor Status by AS</option>
-                    <option value="BGP_N_IP_AS">Check BGP Advertised Routes by AS</option>
-                    <option value="BGP_N_IP_AS">Check BGP Received Routes by AS</option>
+                    <option value="BGP_G_IP">Check BGP Neighbor Status by IP</option>
+                    <option value="BGP_G_AR_IP">Check BGP Advertised Routes by IP</option>
+                    <option value="BGP_G_RR_IP">Check BGP Received Routes by IP</option>
+                    <option value="BGP_G_AS">Check BGP Neighbor Status by AS</option>
+                    <option value="BGP_G_AR_AS" disabled>Check BGP Advertised Routes by AS</option>
+                    <option value="BGP_G_RR_AS">Check BGP Received Routes by AS</option>
                 </select>
             </div>
             <div class="INT">
@@ -131,7 +131,7 @@
             <br>
             <div class="button">
                 <br>
-                <button id="button" type="submit" class="form-submit-button form-submit-button-simple_black"
+                <button id="button" type="submit" class="btn btn-primary"
                     data-component="button"> Submit
             </button>
             </div>

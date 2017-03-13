@@ -52,57 +52,21 @@
                                    id="hostname" required>
                         </div>
                         <br>
-                        {% if 'GRX_ARP_IP' in cmd %}
+                        {% if ('BGP_G_IP' or 'BGP_G_RR_IP' or 'BGP_G_AR_IP') in cmd %}
                         <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
                                                                       aria-hidden="true"></span></span>
-                            <input type="text" class="form-control" placeholder="Enter IP Address to check ARP" name="iparp"
-                                   id="iparp">
-                        </div>
-                        <br>
-                        {% endif %}
-                        {% if ('GRX_BGP_N_IP' or 'GRX_BGP_N_IP_RR' or 'GRX_BGP_N_IP') in cmd  %}
-                        <div class="input-group">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
-                                                                      aria-hidden="true"></span></span>
-                            <input type="text" class="form-control" placeholder="Enter BGP Peer" name="bgppeer"
+                            <input type="text" class="form-control" placeholder="Enter BGP Peer IP Address" name="bgppeer"
                                    id="bgppeer">
                         </div>
                         <br>
                         {% endif %}
-                        {% if ('GRX_ARP_C' or 'GRX_INT_C') in cmd %}
-                        <div class="input-group">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
-                                                                      aria-hidden="true"></span></span>
-                            <input type="text" class="form-control" placeholder="Enter codif" name="codif"
-                                   id="codif">
-                        </div>
-                        <br>
-                        {% endif %}
-                        {% if ('GRX_BGP_N_AS' or 'GRX_BGP_R_AS') in cmd %}
+                        {% if ('BGP_G_AS' or 'BGP_G_RR_AS' or 'BGP_G_AR_AS') in cmd %}
                         <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
                                                                       aria-hidden="true"></span></span>
                             <input type="text" class="form-control" placeholder="Enter AS Number" name="AS"
                                    id="AS">
-                        </div>
-                        <br>
-                        {% endif %}
-                        {% if 'GRX_RT' in cmd %}
-                        <div class="input-group">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
-                                                                      aria-hidden="true"></span></span>
-                            <input type="text" class="form-control" placeholder="Enter Prefix" name="prefix"
-                                   id="prefix">
-                        </div>
-                        <br>
-                        {% endif %}
-                        {% if ('GRX_TR' or 'GRX_PING_VRF') in cmd %}
-                        <div class="input-group">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
-                                                                      aria-hidden="true"></span></span>
-                            <input type="text" class="form-control" placeholder="Enter IP Address (Ping/Trace)" name="pingtrace"
-                                   id="pingtrace">
                         </div>
                         <br>
                         {% endif %}

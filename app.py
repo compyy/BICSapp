@@ -12,7 +12,6 @@ app.secret_key = "g0AwAy"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:P@$$w0rd12@localhost/EmpLog'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'False'
 db = SQLAlchemy(app)
-global cmd
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -61,25 +60,27 @@ def initate_session(input):
 
 def processCMD(connection, input):
     returncmd = []
+    print cmd
     for i in cmd:
         if 'GRX' in i:
             if connection.driver == 'cisco_ios':
                 if 'GRX_ARP_C' in i:
                     arp_codif = True
                 elif 'GRX_ARP_IP' in i:
-                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + input['peer']
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + input['bgppeer']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_AS' in i:
                     j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'summary | i ' + input['AS']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_IP' in i:
-                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'neighbors ' + input['peer']
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'neighbors ' + input['bgppeer']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_RR' in i:
-                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + ' neighbors ' + input['peer'] + ' routes'
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + ' neighbors ' + input['bgppeer'] + ' routes'
                     returncmd.append(j)
                 elif 'GRX_BGP_N_AR' in i:
-                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + ' neighbors ' + input['peer'] + ' advertised-routes'
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + ' neighbors ' + input[
+                        'bgppeer'] + ' advertised-routes'
                     returncmd.append(j)
                 elif 'GRX_BGP_R_AS' in i:
                     j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'regexp ^' + input['AS']
@@ -87,32 +88,33 @@ def processCMD(connection, input):
                 elif 'GRX_INT_C' in i:
                     int_codif = True
                 elif 'GRX_PING_VRF' in i:
-                    j = 'ping vrf cbugrx1 ' + input['peer']
+                    j = 'ping vrf cbugrx1 ' + input['bgppeer']
                     returncmd.append(j)
                 elif 'GRX_RT' in i:
                     j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + input['prefix']
                     returncmd.append(j)
                 elif 'GRX_TR' in i:
-                    j = 'traceroute vrf cbugrx1 ' + input['peer']
+                    j = 'traceroute vrf cbugrx1 ' + input['bgppeer']
                     returncmd.append(j)
 
             elif connection.driver == 'alcatel_sros':
                 if 'GRX_ARP_C' in i:
                     arp_codif = True
                 elif 'GRX_ARP_IP' in i:
-                    j = cmd_dict[connection.driver][i] + ' 110 arp ' + input['peer']
+                    j = cmd_dict[connection.driver][i] + ' 110 arp ' + input['bgppeer']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_AS' in i:
-                    j = cmd_dict[connection.driver][i] + ' 110 ' + ' bgp neighbor ' + input['AS']
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input['AS']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_IP' in i:
-                    j = cmd_dict[connection.driver][i] + ' 110 ' + ' bgp neighbor ' + input['peer']
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input['bgppeer']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_RR' in i:
-                    j = cmd_dict[connection.driver][i] + ' 110 ' + ' bgp neighbor ' + input['peer'] + ' received-routes'
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input['bgppeer'] + ' received-routes'
                     returncmd.append(j)
                 elif 'GRX_BGP_N_AR' in i:
-                    j = cmd_dict[connection.driver][i] + ' 110 ' + ' bgp neighbor ' + input['peer'] + ' advertised-routes'
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input[
+                        'bgppeer'] + ' advertised-routes'
                     returncmd.append(j)
                 elif 'GRX_BGP_R_AS' in i:
                     j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp routes aspath-regex ^' + input['AS']
@@ -120,13 +122,54 @@ def processCMD(connection, input):
                 elif 'GRX_INT_C' in i:
                     int_codif = True
                 elif 'GRX_PING_VRF' in i:
-                    j = 'ping service-name 110 ' + input['peer']
+                    j = 'ping service-name 110 ' + input['pingtrace']
                     returncmd.append(j)
                 elif 'GRX_RT' in i:
                     j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp routes ' + input['prefix']
                     returncmd.append(j)
                 elif 'GRX_TR' in i:
-                    j = 'traceroute service-name 110 ' + input['peer']
+                    j = 'traceroute service-name 110 ' + input['pingtrace']
+                    returncmd.append(j)
+
+        if 'BGP_G' in i:
+            if connection.driver == 'cisco_ios':
+                if 'BGP_G_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + input['bgppeer']
+                    returncmd.append(j)
+                elif 'BGP_G_AR_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + input['bgppeer'] + ' advertised-routes'
+                    returncmd.append(j)
+                elif 'BGP_G_RR_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + input['bgppeer'] + ' routes'
+                    returncmd.append(j)
+                elif 'BGP_G_AS' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + ' summary | i ' + input['AS']
+                    returncmd.append(j)
+                elif 'BGP_G_AR_AS' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + ' summary | i ' + input['AS']
+                    returncmd.append(j)
+                elif 'BGP_G_RR_AS' in i:
+                    j = cmd_dict[connection.driver][i] + 'regexp ^' + input['AS']
+                    returncmd.append(j)
+
+            elif connection.driver == 'alcatel_sros':
+                if 'BGP_G_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + input['bgppeer']
+                    returncmd.append(j)
+                elif 'BGP_G_AR_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + input['bgppeer'] + ' advertised-routes'
+                    returncmd.append(j)
+                elif 'BGP_G_RR_IP' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + input['bgppeer'] + ' received-routes'
+                    returncmd.append(j)
+                elif 'BGP_G_AS' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + input['AS']
+                    returncmd.append(j)
+                elif 'BGP_G_AR_AS' in i:
+                    j = cmd_dict[connection.driver][i] + ' ' + input['bgppeer'] + ' advertised-routes'
+                    returncmd.append(j)
+                elif 'BGP_G_RR_AS' in i:
+                    j = cmd_dict[connection.driver][i] + 'bgp routes aspath-regex ^' + input['AS']
                     returncmd.append(j)
 
     outputCMD = connection.runCMD(returncmd)
@@ -137,17 +180,23 @@ def processCMD(connection, input):
 @login_required
 def GRX():
     if request.method == 'GET':
-        return render_template('GRX.html')
+        return render_template('GRX.html', cmd=cmd)
 
-    input = {'username': request.form['username'],
-             'password': request.form['password'],
-             'hostname': request.form['hostname'],
-             'cmd': cmd,
-             'peer': request.form['peer'],
-             'codif': request.form['codif'],
-             'prefix': request.form['prefix'],
-             'AS': request.form['AS']}
+    input = request.form.to_dict()
+    input['cmd'] = cmd
+    connection = initate_session(input)
+    outputCMD = processCMD(connection, input)
+    return render_template("output.html", ifHostAlive='', cmd=outputCMD)
 
+
+@app.route('/BGP_GLOBAL', methods=['GET', 'POST'])
+@login_required
+def BGP_GLOBAL():
+    if request.method == 'GET':
+        return render_template('BGP.html', cmd=cmd)
+
+    input = request.form.to_dict()
+    input['cmd'] = cmd
     connection = initate_session(input)
     outputCMD = processCMD(connection, input)
     return render_template("output.html", ifHostAlive='', cmd=outputCMD)
@@ -172,6 +221,7 @@ def take_input():
 
     options = request.form.getlist('selectcmd')
     global cmd
+    cmd = []
     cmd = request.form.getlist(options[0])
     return redirect(url_for(options[0]))
 

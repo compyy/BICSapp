@@ -26,5 +26,6 @@ class Router:
     def runCMD(self, cmd):
         output = []
         for i in cmd:
+            print i
             output.append(self.session.send_command(i))
         return output
