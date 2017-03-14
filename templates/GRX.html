@@ -61,7 +61,7 @@
                         </div>
                         <br>
                         {% endif %}
-                        {% if ('GRX_BGP_N_IP' or 'GRX_BGP_N_IP_RR' or 'GRX_BGP_N_IP') in cmd  %}
+                        {% if ('GRX_BGP_N_IP' in cmd) or ('GRX_BGP_N_RR_IP' in cmd) or ('GRX_BGP_N_AR_IP' in cmd)  %}
                         <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
                                                                       aria-hidden="true"></span></span>
@@ -70,7 +70,7 @@
                         </div>
                         <br>
                         {% endif %}
-                        {% if ('GRX_ARP_C' or 'GRX_INT_C') in cmd %}
+                        {% if ('GRX_ARP_C' in cmd) or ('GRX_INT_C' in cmd) %}
                         <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
                                                                       aria-hidden="true"></span></span>
@@ -79,7 +79,7 @@
                         </div>
                         <br>
                         {% endif %}
-                        {% if ('GRX_BGP_N_AS' or 'GRX_BGP_R_AS') in cmd %}
+                        {% if ('GRX_BGP_N_AS' in cmd) or ('GRX_BGP_R_AS' in cmd) %}
                         <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
                                                                       aria-hidden="true"></span></span>
@@ -97,7 +97,7 @@
                         </div>
                         <br>
                         {% endif %}
-                        {% if ('GRX_TR' or 'GRX_PING_VRF') in cmd %}
+                        {% if ('GRX_TR' in cmd) or ('GRX_PING_VRF' in cmd) %}
                         <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
                                                                       aria-hidden="true"></span></span>

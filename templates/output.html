@@ -17,14 +17,16 @@
 </div>
 <div>
     {% for i in cmd %}
-    <div>
-        <pre> {{ i }} </pre>
-    </div>
+    {% for dict_item in i %}
+    {% for key, value in dict_item.items() %}
+    <pre>{{key}} : {{value}}</pre>
     {% endfor %}
-</div>
-<div>
-    <button type="submit" class="btn btn-primary pull-left"
-            onclick="location.href = '/input'" name="action" id="submit">Go Back
-    </button>
+    {% endfor %}
+    {% endfor %}
+    <div>
+        <button type="submit" class="btn btn-primary pull-left"
+                onclick="location.href = '/input'" name="action" id="submit">Go Back
+        </button>
+    </div>
 </div>
 </html>

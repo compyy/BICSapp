@@ -1,5 +1,5 @@
 from netmiko import ConnectHandler
-
+import ansibleapi
 
 class Router:
     def __init__(self, input, driver):
@@ -26,6 +26,16 @@ class Router:
     def runCMD(self, cmd):
         output = []
         for i in cmd:
-            print i
             output.append(self.session.send_command(i))
         return output
+
+
+    def ansible_show(self, cmd):
+        output = []
+        for i in cmd:
+            ansibleoutput = ansibleapi.run_adhoc(self.username, self.password, self.hostname, i, self.driver)
+            output.append(ansibleoutput.host_ok[0]['result']._result['response'])
+
+        return output
+
+

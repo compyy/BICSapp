@@ -1,0 +1,17 @@
+Value NEIGHBOR_ID (\d+(\.\d+){3})
+Value REMOTE_AS (\d+)
+Value STATE (\D.*)
+Value UPTIME (\d+:\d+:\d+)
+Value HOLD_INTERVAL (\d+)
+Value KEEPALIVE_INTERVAL (\d+)
+Value PFX_RECV (\d+)
+Value PFX_ADV (\d+)
+Value LASTUP (\d+:\d+:\d+)
+Value LASTWR (\d+:\d+:\d+)
+
+Start
+	^BGP neighbor.* -> Continue.Record
+	^BGP neighbor is ${NEIGHBOR_ID},\s+remote AS ${REMOTE_AS}
+	^\s+BGP state = ${STATE},\s+up for ${UPTIME}
+	^\s+Last read ${LASTUP},\s+last write ${LASTWR}, hold time is ${HOLD_INTERVAL}, keepalive interval is ${KEEPALIVE_INTERVAL} seconds
+	^\s+Prefixes Total:\s+${PFX_ADV}\s+${PFX_RECV}

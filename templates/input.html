@@ -58,9 +58,9 @@
                 show-menu-arrow data-style="btn-primary" data-width="fit" data-live-search="true">
             <option value="GRX">GRX Troubleshooting</option>
             <option value="BGP_GLOBAL">IP BGP Global Troubleshooting</option>
-            <option value="INT">Interface Level Troubleshooting</option>
-            <option value="PLAT">Router/Switch Troubleshooting</option>
-            <option value="GIGAMON">GIGAMON Troubleshooting</option>
+            <option value="INT" disabled>Interface Level Troubleshooting</option>
+            <option value="PLAT" disabled>Router/Switch Troubleshooting</option>
+            <option value="GIGAMON" disabled>GIGAMON Troubleshooting</option>
         </select>
         <div class="container-fluid">
             <div class="GRX">
@@ -72,13 +72,13 @@
                     <option value="GRX_ARP_IP">ARP Table by IP</option>
                     <option value="GRX_BGP_N_AS">BGP Neighbor Status by ASN</option>
                     <option value="GRX_BGP_N_IP">BGP Neighbor Status by IP</option>
-                    <option value="GRX_BGP_N_RR">BGP Neighbor Received Routes</option>
-                    <option value="GRX_BGP_N_AR">BGP Neighbor Advertised Routes</option>
+                    <option value="GRX_BGP_N_RR_IP">BGP Neighbor Received Routes</option>
+                    <option value="GRX_BGP_N_AR_IP">BGP Neighbor Advertised Routes</option>
                     <option value="GRX_BGP_R_AS">BGP Routes by ASN</option>
                     <option value="GRX_INT_C" disabled>Interface by Codif</option>
                     <option value="GRX_PING_VRF">Ping Prefixes</option>
-                    <option value="GRX_RT">Routing Table Prefix</option>
-                    <option value="GRX_TR">Traceroute Prefix</option>
+                    <option value="GRX_RTF">Routing Table Prefix</option>
+                    <option value="GRX_TRACE">Traceroute Prefix</option>
                 </select>
             </div>
             <div class="BGP_GLOBAL">

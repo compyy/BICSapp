@@ -60,14 +60,13 @@ def initate_session(input):
 
 def processCMD(connection, input):
     returncmd = []
-    print cmd
     for i in cmd:
         if 'GRX' in i:
             if connection.driver == 'cisco_ios':
                 if 'GRX_ARP_C' in i:
                     arp_codif = True
                 elif 'GRX_ARP_IP' in i:
-                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + input['bgppeer']
+                    j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + input['iparp']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_AS' in i:
                     j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'summary | i ' + input['AS']
@@ -75,10 +74,10 @@ def processCMD(connection, input):
                 elif 'GRX_BGP_N_IP' in i:
                     j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + 'neighbors ' + input['bgppeer']
                     returncmd.append(j)
-                elif 'GRX_BGP_N_RR' in i:
+                elif 'GRX_BGP_N_RR_IP' in i:
                     j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + ' neighbors ' + input['bgppeer'] + ' routes'
                     returncmd.append(j)
-                elif 'GRX_BGP_N_AR' in i:
+                elif 'GRX_BGP_N_AR_IP' in i:
                     j = cmd_dict[connection.driver][i] + ' cbugrx1 ' + ' neighbors ' + input[
                         'bgppeer'] + ' advertised-routes'
                     returncmd.append(j)
@@ -101,7 +100,7 @@ def processCMD(connection, input):
                 if 'GRX_ARP_C' in i:
                     arp_codif = True
                 elif 'GRX_ARP_IP' in i:
-                    j = cmd_dict[connection.driver][i] + ' 110 arp ' + input['bgppeer']
+                    j = cmd_dict[connection.driver][i] + ' 110 arp ' + input['iparp']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_AS' in i:
                     j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input['AS']
@@ -109,10 +108,10 @@ def processCMD(connection, input):
                 elif 'GRX_BGP_N_IP' in i:
                     j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input['bgppeer']
                     returncmd.append(j)
-                elif 'GRX_BGP_N_RR' in i:
+                elif 'GRX_BGP_N_RR_IP' in i:
                     j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input['bgppeer'] + ' received-routes'
                     returncmd.append(j)
-                elif 'GRX_BGP_N_AR' in i:
+                elif 'GRX_BGP_N_AR_IP' in i:
                     j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input[
                         'bgppeer'] + ' advertised-routes'
                     returncmd.append(j)
@@ -172,7 +171,7 @@ def processCMD(connection, input):
                     j = cmd_dict[connection.driver][i] + 'bgp routes aspath-regex ^' + input['AS']
                     returncmd.append(j)
 
-    outputCMD = connection.runCMD(returncmd)
+    outputCMD = connection.ansible_show(returncmd)
     return outputCMD
 
 
@@ -199,6 +198,7 @@ def BGP_GLOBAL():
     input['cmd'] = cmd
     connection = initate_session(input)
     outputCMD = processCMD(connection, input)
+    print outputCMD
     return render_template("output.html", ifHostAlive='', cmd=outputCMD)
 
 
