@@ -1,16 +1,20 @@
 import Router
+import sros
 import F5
-import telnetlib
+import os
 from Dictionary import cmd_dict
-from Dictionary import driver_dict
 from flask import Flask, request, flash, url_for, redirect, render_template, g, session
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from flask_sqlalchemy import SQLAlchemy
+import ansibleapi
+from easysnmp import Session
+import re
 
 app = Flask(__name__)
 app.secret_key = "g0AwAy"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:P@$$w0rd12@localhost/EmpLog'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'False'
+os.environ['MIBDIRS'] = '/home/beta/BICSapp/MIB'
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
@@ -45,17 +49,26 @@ class User(db.Model):
 
 
 def initate_session(input):
-    driver = 'Cisco'
     try:
-        connection = telnetlib.Telnet(input['hostname'], 22)
-        get_driver = connection.expect([r'^SSH\-\d\.\d+\-(.*)(\-|\_).*', ])
-        driver = get_driver[1].group(1)
-        connection.close()
+        session = Session(hostname=input['hostname'], community='public', version=2)
+        description = session.get('.1.3.6.1.2.1.1.1.0')
+
 
     except Exception as e:
         print "Unable to Login to the Host Error: ", e
 
-    return Router.Router(input, driver_dict[driver])
+    if (re.search('Cisco IOS', description.value, flags=re.IGNORECASE)):
+        driver = 'cisco_ios'
+
+    elif (re.search('ALCATEL', description.value, flags=re.IGNORECASE) or re.search('nokia', description.value,
+                                                                                    flags=re.IGNORECASE)):
+        driver = 'alcatel_sros'
+
+    else:
+        print "Unable to identify System"
+        driver = ''
+
+    return Router.Router(input, driver)
 
 
 def processCMD(connection, input):
@@ -109,7 +122,8 @@ def processCMD(connection, input):
                     j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input['bgppeer']
                     returncmd.append(j)
                 elif 'GRX_BGP_N_RR_IP' in i:
-                    j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input['bgppeer'] + ' received-routes'
+                    j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input[
+                        'bgppeer'] + ' received-routes'
                     returncmd.append(j)
                 elif 'GRX_BGP_N_AR_IP' in i:
                     j = cmd_dict[connection.driver][i] + ' 110 ' + 'bgp neighbor ' + input[
@@ -188,6 +202,63 @@ def GRX():
     return render_template("output.html", ifHostAlive='', cmd=outputCMD)
 
 
+@app.route('/ASASHOW', methods=['GET', 'POST'])
+@login_required
+def ASASHOW():
+    if request.method == 'GET':
+        return render_template('showasa.html', cmd=cmd)
+
+    input = request.form.to_dict()
+    command = []
+    module = 'asa_command'
+
+    for i in cmd:
+        if 'ASASHOW_S_O' in i:
+            command.append(cmd_dict['cisco_asa'][i] + input['obj'])
+        elif 'ASASHOW_S_GO' in i:
+            command.append(cmd_dict['cisco_asa'][i] + input['objg'])
+        elif 'ASASHOW_S_ACL' in i:
+            command.append(cmd_dict['cisco_asa'][i] + input['acl'])
+
+    ansibleoutput = ansibleapi.run_asa(input, command, module)
+    output = ansibleoutput.host_ok[0]['result']._result['stdout']
+    return render_template("outputasa.html", ifHostAlive='Host is reachable', output=output)
+
+
+@app.route('/ASACONF', methods=['GET', 'POST'])
+@login_required
+def ASACONF():
+    if request.method == 'GET':
+        return render_template('confasa.html', cmd=cmd)
+
+    input = request.form.to_dict()
+
+    ansibleoutput = []
+    output = []
+    for i in cmd:
+        if 'ASACONF_C_ACL' in i:
+            ansibleoutput.append(ansibleapi.run_asa(input, cmd_dict['cisco_asa'][i], 'asa_acl'))
+        elif 'ASACONF_C_O' in i:
+            ansibleoutput.append(ansibleapi.run_asa(input, cmd_dict['cisco_asa'][i], 'asa_config'))
+        elif 'ASACONF_C_GO' in i:
+            ansibleoutput.append(ansibleapi.run_asa(input, cmd_dict['cisco_asa'][i], 'asa_config'))
+
+
+    for i in ansibleoutput:
+        print i.host_ok[0]['result']._result
+        changed = i.host_ok[0]['result']._result['changed']
+        if changed:
+            output.append('Following configurations has been applied on the FW.\n' +
+                          '\n'.join([str(j) for j in i.host_ok[0]['result']._result['updates']]))
+        else:
+            parent = i.host_ok[0]['result']._result['invocation']['module_args'].get('parents', '')
+            output.append('Following Configurations were not applied as same config already present in FW.\n' +'\n'+ '\n'.join(
+                [str(j) for j in parent]) +'\n'+ '\n'.join(
+                [str(k) for k in i.host_ok[0]['result']._result['invocation']['module_args']['lines']]))
+
+    return render_template("outputasa.html", ifHostAlive='Host is reachable', output=output)
+
+
 @app.route('/BGP_GLOBAL', methods=['GET', 'POST'])
 @login_required
 def BGP_GLOBAL():
@@ -196,9 +267,19 @@ def BGP_GLOBAL():
 
     input = request.form.to_dict()
     input['cmd'] = cmd
+    # for i in cmd:
+    #   if 'BGP_G_IP' in i:
+    #       args = dict()
+    #       args['community'] = 'public'
+    #       nokia = sros.SrosDriver(input['hostname'], input['username'], input['password'], 20, args)
+    #       nokia.open()
+    #       if hasattr(nokia, 'get_bgp_neighbors'):
+    #           out = getattr(nokia, 'get_bgp_neighbors')()
+
+    #       print out
+    #        return redirect(url_for('index'))
     connection = initate_session(input)
     outputCMD = processCMD(connection, input)
-    print outputCMD
     return render_template("output.html", ifHostAlive='', cmd=outputCMD)
 
 

@@ -1,5 +1,3 @@
-driver_dict = {'Cisco': 'cisco_ios', 'OpenSSH': 'alcatel_sros'}
-
 cmd_dict = {
     'cisco_ios': {
         'BGP_G_IP': 'show ip bgp ipv4 unicast neighbor',
@@ -22,7 +20,7 @@ cmd_dict = {
         'GRX_BGP_R_AS': 'show ip bgp vpnv4 vrf',
         'GRX_RTF': 'show ip bgp vpnv4 vrf',
         'R_INT': 'show interface',
-        'R_INT_C': 'show interface',
+        'R_INT_C': 'show interface'
 
     },
     'alcatel_sros': {
@@ -46,6 +44,14 @@ cmd_dict = {
         'GRX_BGP_R_AS': 'show router',
         'GRX_RTF': 'show router',
         'R_INT': 'show port',
-        'R_INT_C': 'show port',
+        'R_INT_C': 'show port'
+    },
+    'cisco_asa': {
+        'ASASHOW_S_O': 'show running-config object id ',
+        'ASASHOW_S_GO': 'show running-config object-group id ',
+        'ASASHOW_S_ACL': 'show run access-list ',
+        'ASACONF_C_O': 'obj',
+        'ASACONF_C_GO': 'objg',
+        'ASACONF_C_ACL': 'acl'
     }
 }

@@ -61,6 +61,10 @@
             <option value="INT" disabled>Interface Level Troubleshooting</option>
             <option value="PLAT" disabled>Router/Switch Troubleshooting</option>
             <option value="GIGAMON" disabled>GIGAMON Troubleshooting</option>
+            <option value="ASASHOW">Firewall/ASA Troubleshooting</option>
+			<option value="ASACONF">Firewall/ASA Configurations</option>
+
+			
         </select>
         <div class="container-fluid">
             <div class="GRX">
@@ -126,6 +130,28 @@
                     <option value="GIGAMON_INT_S">Check Interface Status on Gigamon</option>
                     <option value="GIGAMON_VLAN">Check VLAN Configurations</option>
 
+                </select>
+            </div>
+            <br>
+            <div class="ASASHOW">
+                <br>
+                <select name="ASASHOW" class="selectpicker" title="Choose your option, multiple can be selected" multiple
+                        show-menu-arrow data-style="btn-success" data-width="fit" data-selected-text-format="count > 3"
+                        data-live-search="true">
+                    <option value="ASASHOW_S_O">Show ASA Objects</option>
+                    <option value="ASASHOW_S_GO">Show ASA Object Groups</option>
+                    <option value="ASASHOW_S_ACL">Show ASA ACL</option>
+                </select>
+            </div>
+            <br>
+			<div class="ASACONF">
+                <br>
+                <select name="ASACONF" class="selectpicker" title="Choose your option, multiple can be selected" multiple
+                        show-menu-arrow data-style="btn-success" data-width="fit" data-selected-text-format="count > 3"
+                        data-live-search="true">
+                    <option value="ASACONF_C_O">Configure ASA Objects</option>
+                    <option value="ASACONF_C_GO">Configure ASA Object Groups</option>
+                    <option value="ASACONF_C_ACL">Configure ASA ACL</option>
                 </select>
             </div>
             <br>

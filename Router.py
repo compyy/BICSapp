@@ -33,7 +33,7 @@ class Router:
     def ansible_show(self, cmd):
         output = []
         for i in cmd:
-            ansibleoutput = ansibleapi.run_adhoc(self.username, self.password, self.hostname, i, self.driver)
+            ansibleoutput = ansibleapi.run_ntcshow(self.username, self.password, self.hostname, i, self.driver)
             output.append(ansibleoutput.host_ok[0]['result']._result['response'])
 
         return output
