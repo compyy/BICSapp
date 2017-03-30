@@ -174,8 +174,7 @@ def run_asa(input, cmd, module):
 
             tasks=[
                 dict(action=dict(module=module, username=input['username'], password=input['password'], host=input['hostname'], authorize='yes',
-                                 auth_pass=input['password'], args=dict(lines=cmdconf
-                                                                        ),
+                                 auth_pass=input['password'], args=dict(lines=cmdconf)
                                  )
                      )
             ]
